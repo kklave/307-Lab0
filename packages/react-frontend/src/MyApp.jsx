@@ -31,13 +31,6 @@ function MyApp() {
     return promise;
   }
 
-  // function removeOneCharacter(index) {
-  //   const updated = characters.filter((character, i) => {
-  //     return i !== index;
-  //   });
-  //   setCharacters(updated);
-  // }
-
   function removeOneCharacter(index) {
     const userToDeleteID = characters[index].id;
   
@@ -69,7 +62,6 @@ function MyApp() {
     postUser(person)
       .then((res) => {
         if (res.status === 201) {
-          //setCharacters([...characters, person]);
           return res.json();
         } 
         else {
