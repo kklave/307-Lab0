@@ -19,15 +19,69 @@ function MyApp() {
     return promise;
   }
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+  function postUser(person) {
+    const promise = fetch("http://localhost:8000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(person),
     });
-    setCharacters(updated);
+
+    return promise;
   }
 
-  function updateList(person) {
-    setCharacters([...characters, person]);
+  // function removeOneCharacter(index) {
+  //   const updated = characters.filter((character, i) => {
+  //     return i !== index;
+  //   });
+  //   setCharacters(updated);
+  // }
+
+  function removeOneCharacter(index) {
+    const userToDeleteID = characters[index].id;
+  
+    const promise = fetch(`http://localhost:8000/users/${userToDeleteID}`, {
+      method: 'DELETE',
+    })
+      .then((res) => {
+        if (res.status === 204) 
+        {
+          const updated = characters.filter((character, i) => {
+            return i !== index;
+          });
+          setCharacters(updated);
+        } 
+        else if (res.status === 404) 
+        {
+          console.error("Resource not found.");
+        } 
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      return promise;
+  }
+
+
+  function updateList(person) { 
+    postUser(person)
+      .then((res) => {
+        if (res.status === 201) {
+          //setCharacters([...characters, person]);
+          return res.json();
+        } 
+        else {
+          console.log("Not 201");
+        }
+      })
+      .then((json) => {
+        setCharacters([...characters, json]);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
   return (

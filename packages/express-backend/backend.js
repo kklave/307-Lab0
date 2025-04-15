@@ -36,6 +36,10 @@ const users = {
   ]
 };
 
+const generateID = (user) => {
+  user.id = (Math.random() * 100).toString();
+}
+
 const findUserByName = (name) => {
   return users["users_list"].filter(
     (user) => user["name"] === name
@@ -48,17 +52,17 @@ const findUserByJob = (job) => {
   );
 };
 
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
+const findUserById = (id) => {
+  return users["users_list"].find((user) => user["id"] === id);
+}
 
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
 };
 
-const removeUser = (user) => {
-  users["users_list"].pop(user);
-  return user;
+const removeUser = (id) => {
+  users.users_list = users.users_list.filter((user) => user.id !== id);
 };
 
 app.use(cors());
@@ -100,14 +104,23 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
+  generateID(userToAdd);
   addUser(userToAdd);
-  res.send();
+  res.status(201).json(userToAdd);
 });
 
-app.delete("/users", (req, res) => {
-  const userToRemove = req.body;
-  removeUser(userToRemove);
-  res.send();
+app.delete("/users/:id", (req, res) => {
+  const id = req.params.id; //or req.params.id
+  const userToRemove = findUserById(id);
+  if (userToRemove === undefined)
+  {
+    res.status(404).send("Resource not found.");
+  }
+  else 
+  {
+    removeUser(id);
+    res.status(204).send();
+  }
 });
 
 app.listen(port, () => {
